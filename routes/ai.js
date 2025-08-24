@@ -108,13 +108,20 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
         }
       } catch (e) { console.warn('Jimp threshold skipped:', e.message); }
 
-      if (typeof img.getBufferAsync === 'function') {
-        processedImageBuffer = await img.getBufferAsync(J.MIME_PNG);
-      } else {
-        // fallback for older builds
-        processedImageBuffer = await new Promise((res, rej) => {
-          img.getBuffer(J.MIME_PNG, (err, buff) => (err ? rej(err) : res(buff)));
-        });
+      // Always use a safe literal MIME; some environments don't expose J.MIME_PNG
+      const outMime = 'image/png';
+      try {
+        if (typeof img.getBufferAsync === 'function') {
+          processedImageBuffer = await img.getBufferAsync(outMime);
+        } else {
+          // fallback for older builds
+          processedImageBuffer = await new Promise((res, rej) => {
+            img.getBuffer(outMime, (err, buff) => (err ? rej(err) : res(buff)));
+          });
+        }
+      } catch (bufErr) {
+        console.warn('Jimp getBuffer failed, using original upload buffer:', bufErr.message);
+        processedImageBuffer = req.file.buffer;
       }
     } catch (prepErr) {
       console.warn('🟡 Jimp preprocessing failed, falling back to raw buffer:', prepErr.message);
