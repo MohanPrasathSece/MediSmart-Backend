@@ -1,0 +1,36 @@
+# Backend specific ignores (Node.js / Express)
+
+# Dependency directory
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Coverage
+coverage/
+
+# Environment variables
+
+
+# Database dumps
+*.sql
+dump.rdb
+
+# Build output / compiled code (if any)
+build/
+dist/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+".env" 
+".env" 
+".env" 

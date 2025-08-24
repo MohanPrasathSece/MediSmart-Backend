@@ -1,0 +1,220 @@
+[Hugging Face](https://huggingface.co/)
+- [Models](https://huggingface.co/models)
+
+- [Datasets](https://huggingface.co/datasets)
+
+- [Spaces](https://huggingface.co/spaces)
+
+- 
+
+
+			Community
+
+
+
+
+
+- [Docs](https://huggingface.co/docs)
+
+- [Enterprise](https://huggingface.co/enterprise)
+
+- [Pricing](https://huggingface.co/pricing)
+- 
+
+
+
+
+
+
+
+- 
+- [Log In](https://huggingface.co/login)
+- [Sign Up](https://huggingface.co/join)
+[Models](https://huggingface.co/models)
+[Datasets](https://huggingface.co/datasets)
+[Spaces](https://huggingface.co/spaces)
+[Docs](https://huggingface.co/docs)
+[Enterprise](https://huggingface.co/enterprise)
+[Pricing](https://huggingface.co/pricing)
+[Log In](https://huggingface.co/login)
+[Sign Up](https://huggingface.co/join)
+
+# ai-forever / [T5-large-spell](https://huggingface.co/ai-forever/T5-large-spell) like 9
+
+[ai-forever](https://huggingface.co/ai-forever)
+[T5-large-spell](https://huggingface.co/ai-forever/T5-large-spell)
+[Transformers](https://huggingface.co/models?library=transformers)
+[PyTorch](https://huggingface.co/models?library=pytorch)
+[Safetensors](https://huggingface.co/models?library=safetensors)
+[English](https://huggingface.co/models?language=en)
+[t5](https://huggingface.co/models?other=t5)
+[text2text-generation](https://huggingface.co/models?other=text2text-generation)
+[spellchecking](https://huggingface.co/models?other=spellchecking)
+[NLP](https://huggingface.co/models?other=NLP)
+[T5](https://huggingface.co/models?other=T5)
+[natural language generation](https://huggingface.co/models?other=natural+language+generation)
+[text-generation-inference](https://huggingface.co/models?other=text-generation-inference)
+[Model card](https://huggingface.co/ai-forever/T5-large-spell)
+[Files
+		Files and versions](https://huggingface.co/ai-forever/T5-large-spell/tree/main)
+[Community
+	4](https://huggingface.co/ai-forever/T5-large-spell/discussions)
+- T5-large-spell model
+									Metrics
+												Quality
+
+											How to use
+
+											Resources
+
+											License
+
+											Specifications
+
+											Contacts
+
+
+
+- Metrics
+												Quality
+
+
+- Quality
+
+- How to use
+
+
+- Resources
+
+
+- License
+
+
+- Specifications
+
+
+- Contacts
+
+
+T5-large-spell model
+- Metrics
+												Quality
+
+
+- Quality
+
+- How to use
+
+
+- Resources
+
+
+- License
+
+
+- Specifications
+
+
+- Contacts
+
+
+Metrics
+- Quality
+
+Quality
+How to use
+Resources
+License
+Specifications
+Contacts
+
+### Summary
+The model corrects spelling errors and typos by bringing all words in the text to the standard English language. The proofreader was trained based on the T5-large model. An extensive dataset with “artificial” errors was taken as a training corpus: the corpus was assembled on the basis of the English-language Wikipedia and News blogs, then typos and spelling errors were automatically introduced into it using the functionality of the [SAGE library](https://github.com/ai-forever/sage).
+
+### Public references
+- [SAGE library announcement](https://youtu.be/yFfkV0Qjuu0), DataFest 2023
+- [Paper about synthetic error generation methods](https://www.dialog-21.ru/media/5914/martynovnplusetal056.pdf), Dialogue 2023
+- [Paper about SAGE and our best solution](https://arxiv.org/abs/2308.09435), Review EACL 2024
+[SAGE library announcement](https://youtu.be/yFfkV0Qjuu0)
+[Paper about synthetic error generation methods](https://www.dialog-21.ru/media/5914/martynovnplusetal056.pdf)
+[Paper about SAGE and our best solution](https://arxiv.org/abs/2308.09435)
+
+### Quality
+
+Below are automatic metrics for determining the correctness of the spell checkers. We present a comparison of our solution both with open automatic spell checkers and with the ChatGPT family of models on two available datasets:
+- BEA60K: English spelling errors collected from several domains;
+- JFLEG: 1601 sentences in English, which contain about 2 thousand spelling errors;
+BEA60K
+[https://github.com/neuspell/neuspell](https://github.com/neuspell/neuspell)
+[https://github.com/neuspell/neuspell](https://github.com/neuspell/neuspell)
+JFLEG
+[https://github.com/neuspell/neuspell](https://github.com/neuspell/neuspell)
+[https://github.com/neuspell/neuspell](https://github.com/neuspell/neuspell)
+
+## How to use
+```
+from transformers import T5ForConditionalGeneration, AutoTokenizer path_to_model = "ai-forever/T5-large-spell" model = T5ForConditionalGeneration.from_pretrained(path_to_model) tokenizer = AutoTokenizer.from_pretrained(path_to_model) prefix = "grammar: " sentence = "If you bought something goregous, you well be very happy." sentence = prefix + sentence encodings = tokenizer(sentence, return_tensors="pt") generated_tokens = model.generate(**encodings) answer = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True) print(answer) # ["If you bought something gorgeous, you will be very happy."]
+```
+
+
+```
+from transformers import T5ForConditionalGeneration, AutoTokenizer path_to_model = "ai-forever/T5-large-spell" model = T5ForConditionalGeneration.from_pretrained(path_to_model) tokenizer = AutoTokenizer.from_pretrained(path_to_model) prefix = "grammar: " sentence = "If you bought something goregous, you well be very happy." sentence = prefix + sentence encodings = tokenizer(sentence, return_tensors="pt") generated_tokens = model.generate(**encodings) answer = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True) print(answer) # ["If you bought something gorgeous, you will be very happy."]
+```
+
+## Resources
+- [SAGE library](https://github.com/ai-forever/sage), GitHub
+- [ruM2M100-1.2B](https://huggingface.co/ai-forever/RuM2M100-1.2B), HuggingFace
+- [ruM2M100-418M](https://huggingface.co/ai-forever/RuM2M100-420M), HuggingFace
+- [FredT5-large-spell](https://huggingface.co/ai-forever/FRED-T5-large-spell), HuggingFace
+- [T5-large-spell](https://huggingface.co/ai-forever/T5-large-spell), HuggingFace
+[SAGE library](https://github.com/ai-forever/sage)
+[ruM2M100-1.2B](https://huggingface.co/ai-forever/RuM2M100-1.2B)
+[ruM2M100-418M](https://huggingface.co/ai-forever/RuM2M100-420M)
+[FredT5-large-spell](https://huggingface.co/ai-forever/FRED-T5-large-spell)
+[T5-large-spell](https://huggingface.co/ai-forever/T5-large-spell)
+
+## License
+The [T5-large](https://huggingface.co/t5-large) model, on which our solution is based, and its source code are supplied under the APACHE-2.0 license. Our solution is supplied under MIT license.
+
+## Specifications
+- File size: 3 Gb;
+- Framework: pytorch
+- Format: AI Service
+- Version: v1.0
+- Developer: SberDevices, AGI NLP
+
+## Contacts
+[nikita.martynov.98@list.ru](mailto:nikita.martynov.98@list.ru)
+Files info
+[NEW](https://huggingface.co/docs/inference-providers)
+[🙋
+
+						Ask for provider support](https://huggingface.co/spaces/huggingface/InferenceSupport/discussions/new?title=ai-forever/T5-large-spell&description=React%20to%20this%20comment%20with%20an%20emoji%20to%20vote%20for%20%5Bai-forever%2FT5-large-spell%5D(%2Fai-forever%2FT5-large-spell)%20to%20be%20supported%20by%20Inference%20Providers.%0A%0A(optional)%20Which%20providers%20are%20you%20interested%20in%3F%20(Novita%2C%20Hyperbolic%2C%20Together%E2%80%A6)%0A)
+
+## Collection including ai-forever/T5-large-spell
+[SAGE v1.0.0 release
+
+					Collection
+
+
+
+				5 items
+				• 
+				Updated
+					Mar 26
+				•
+
+
+
+					1](https://huggingface.co/collections/ai-forever/sage-v100-release-66acd71334bfa59f7c341e0b)
+
+#### SAGE v1.0.0 release
+[TOS](https://huggingface.co/terms-of-service)
+[Privacy](https://huggingface.co/privacy)
+[About](https://huggingface.co/huggingface)
+[Jobs](https://apply.workable.com/huggingface/)
+[Models](https://huggingface.co/models)
+[Datasets](https://huggingface.co/datasets)
+[Spaces](https://huggingface.co/spaces)
+[Pricing](https://huggingface.co/pricing)
+[Docs](https://huggingface.co/docs)
