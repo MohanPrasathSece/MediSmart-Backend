@@ -136,16 +136,28 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
 
     // Step 2b: OCR with local Tesseract.js
     console.log('STEP 2b: Extracting text with Tesseract.js...');
-    const { data: { text } } = await Tesseract.recognize(
+
+    // Build Tesseract options conditionally: Node workers cannot use remote URLs
+    const isNode = !!(typeof process !== 'undefined' && process.versions && process.versions.node);
+    const tesseractOptions = { logger: m => console.log(m) };
+    if (!isNode) {
+      // In browser-like environments, allow CDN URLs
+      tesseractOptions.workerPath = 'https://cdn.jsdelivr.net/npm/tesseract.js@v5/dist/worker.min.js';
+      tesseractOptions.corePath = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@v5/tesseract-core.wasm.js';
+      tesseractOptions.langPath = 'https://tessdata.projectnaptha.com/4.0.0';
+    }
+
+    // Add a timeout wrapper to avoid long hangs on OCR
+    const ocrWithTimeout = (buf, lang, opts, ms = 60000) => Promise.race([
+      Tesseract.recognize(buf, lang, opts),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('OCR timeout')), ms))
+    ]);
+
+    const { data: { text } } = await ocrWithTimeout(
       processedImageBuffer,
       'eng',
-      {
-        logger: m => console.log(m),
-        // Pin asset URLs to ensure availability in production
-        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@v5/dist/worker.min.js',
-        corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@v5/tesseract-core.wasm.js',
-        langPath: 'https://tessdata.projectnaptha.com/4.0.0'
-      }
+      tesseractOptions,
+      60000
     );
     console.log('--- Tesseract.js OCR Success ---');
 
