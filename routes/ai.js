@@ -93,10 +93,12 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
       // Normalize may be absent in some builds
       try { if (typeof img.normalize === 'function') img.normalize(); } catch (e) { console.warn('Jimp normalize skipped:', e.message); }
 
-      // Upscale for more DPI
+      // Upscale for more DPI but cap to avoid OOM on small dynos
       try {
-        const w = Math.max(1, img.bitmap.width * 2);
-        const h = Math.max(1, img.bitmap.height * 2);
+        const scale = 1.5; // lighter than 2x
+        const maxDim = 1600;
+        const w = Math.min(maxDim, Math.max(1, Math.round(img.bitmap.width * scale)));
+        const h = Math.min(maxDim, Math.max(1, Math.round(img.bitmap.height * scale)));
         img.resize(w, h);
       } catch (e) { console.warn('Jimp resize skipped:', e.message); }
 
@@ -132,7 +134,13 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
     const { data: { text } } = await Tesseract.recognize(
       processedImageBuffer,
       'eng',
-      { logger: m => console.log(m) }
+      {
+        logger: m => console.log(m),
+        // Pin asset URLs to ensure availability in production
+        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@v5/dist/worker.min.js',
+        corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@v5/tesseract-core.wasm.js',
+        langPath: 'https://tessdata.projectnaptha.com/4.0.0'
+      }
     );
     console.log('--- Tesseract.js OCR Success ---');
 
@@ -217,7 +225,8 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
           headers: {
             Authorization: `Bearer ${HUGGING_FACE_API_KEY}`,
             'Content-Type': 'application/json'
-          }
+          },
+          timeout: 20000
         }
       );
 
