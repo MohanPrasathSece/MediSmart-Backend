@@ -71,10 +71,14 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
 
     console.log('STEP 1: Received prescription image upload request.');
 
-        // Step 2a: Pre-process image with Jimp to boost OCR accuracy
-    console.log('STEP 2a: Pre-processing image for better OCR accuracy...');
+        // Step 2a: Pre-process image with Jimp to boost OCR accuracy (can be disabled via env)
+    const enableJimp = process.env.AI_PREPROCESS === 'true';
     let processedImageBuffer = req.file.buffer;
-    try {
+    if (!enableJimp) {
+      console.log('STEP 2a: Skipping Jimp preprocessing (AI_PREPROCESS is not "true").');
+    } else {
+      console.log('STEP 2a: Pre-processing image for better OCR accuracy...');
+      try {
       // Jimp v1.x exports a { Jimp } key but some installs expose functions on root – handle both.
       const J = Jimp.Jimp || Jimp;
       const img = await J.read(req.file.buffer);
@@ -127,6 +131,7 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
       }
     } catch (prepErr) {
       console.warn('🟡 Jimp preprocessing failed, falling back to raw buffer:', prepErr.message);
+    }
     }
 
     // Step 2b: OCR with local Tesseract.js
