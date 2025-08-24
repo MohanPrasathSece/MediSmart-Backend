@@ -78,12 +78,35 @@ router.post('/upload-prescription', auth, uploadToMemory.single('prescription'),
       // Jimp v1.x exports a { Jimp } key but some installs expose functions on root – handle both.
       const J = Jimp.Jimp || Jimp;
       const img = await J.read(req.file.buffer);
-      await img
-        .greyscale()              // remove colour noise
-        .contrast(0.6)            // increase text contrast
-        .normalize()              // normalize histogram
-        .resize(img.bitmap.width * 2, img.bitmap.height * 2) // upscale for more DPI
-        .threshold({ max: 190 }); // adaptive threshold to binarise
+
+      // Apply operations step-by-step with compatibility fallbacks
+      try { if (typeof img.greyscale === 'function') img.greyscale(); } catch (e) { console.warn('Jimp greyscale skipped:', e.message); }
+
+      // Contrast API differs across versions; try number, then object signature
+      try {
+        if (typeof img.contrast === 'function') {
+          try { img.contrast(0.6); }
+          catch { img.contrast({ contrast: 0.6 }); }
+        }
+      } catch (e) { console.warn('Jimp contrast skipped:', e.message); }
+
+      // Normalize may be absent in some builds
+      try { if (typeof img.normalize === 'function') img.normalize(); } catch (e) { console.warn('Jimp normalize skipped:', e.message); }
+
+      // Upscale for more DPI
+      try {
+        const w = Math.max(1, img.bitmap.width * 2);
+        const h = Math.max(1, img.bitmap.height * 2);
+        img.resize(w, h);
+      } catch (e) { console.warn('Jimp resize skipped:', e.message); }
+
+      // Threshold API can vary; try object form then numeric
+      try {
+        if (typeof img.threshold === 'function') {
+          try { img.threshold({ max: 190 }); }
+          catch { img.threshold(190); }
+        }
+      } catch (e) { console.warn('Jimp threshold skipped:', e.message); }
 
       if (typeof img.getBufferAsync === 'function') {
         processedImageBuffer = await img.getBufferAsync(J.MIME_PNG);
